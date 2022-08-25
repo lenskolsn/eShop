@@ -6,9 +6,9 @@ namespace eShop.Areas.Admin.Controllers
 {
     public class CategoryController : BaseController
     {
-        public CategoryController(AppDbContext db): base(db)
+        public CategoryController(AppDbContext db) : base(db)
         {
-            
+
         }
         public IActionResult Index()
         {
@@ -33,6 +33,33 @@ namespace eShop.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        public IActionResult Update(int id)
+        {
+            var category = _db.Categories.Find(id);
+            return View(category);
+        }
+        [HttpPost]
+        public IActionResult Update(int id, Category ct)
+        {
+            var category = _db.Categories.Find(id);
+            category.Name = ct.Name;
+            category.UpdateAt = DateTime.Now;
+            _db.SaveChanges();
+            return RedirectToAction("Index");
+        }
 
+        public IActionResult Delete(int id)
+        {
+            Category ct = _db.Categories.Find(id);
+            _db.Categories.Remove(ct);
+            _db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Detail(int id)
+        {
+            var category = _db.Categories.Find(id);
+            return View(category);
+        }
     }
 }
