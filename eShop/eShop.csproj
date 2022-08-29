@@ -18,10 +18,15 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Common\" />
-    <Folder Include="Areas\Admin\ViewModels\" />
     <Folder Include="Common\" />
     <Folder Include="Database\DataSeeders\" />
     <Folder Include="WebConfigs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Areas\Admin\Controllers\BaseController.cs">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
 
 </Project>

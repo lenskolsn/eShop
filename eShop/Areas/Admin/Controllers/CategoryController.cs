@@ -1,6 +1,8 @@
-﻿using eShop.Database;
+﻿using eShop.Areas.Admin.ViewModels.Category;
+using eShop.Database;
 using eShop.Database.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace eShop.Areas.Admin.Controllers
 {
@@ -12,7 +14,16 @@ namespace eShop.Areas.Admin.Controllers
         }
         public IActionResult Index()
         {
-            var data = _db.Categories.OrderByDescending(c => c.Id).ToList();
+            var query = _db.Categories
+                .Select(c=>new ListItemCategoryVM
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    CreatedAt = c.CreateAt
+                })
+                .OrderByDescending(c => c.Id);
+            ViewBag.Sql = query.ToQueryString();
+            var data = query.ToList();
             return View(data);
         }
 
@@ -21,14 +32,21 @@ namespace eShop.Areas.Admin.Controllers
             return View();
         }
 
-        // public IActionResult Create() => View();
-
         [HttpPost]
-        public IActionResult Create(Category ct)
+        public IActionResult Create(AddOrUpdateCategoryVM categoryVM)
         {
-            ct.CreateAt = DateTime.Now;
-            ct.UpdateAt = DateTime.Now;
-            _db.Categories.Add(ct);
+            // xác thực dữ liệu
+            if(ModelState.IsValid == false)
+            {
+                return View(categoryVM);
+            }
+            // lưu vào database
+            var category = new Category();
+            category.CreateAt = DateTime.Now;
+            category.UpdateAt = DateTime.Now;
+            category.Name = categoryVM.Name;
+
+            _db.Categories.Add(category);
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
@@ -54,12 +72,6 @@ namespace eShop.Areas.Admin.Controllers
             _db.Categories.Remove(ct);
             _db.SaveChanges();
             return RedirectToAction("Index");
-        }
-
-        public IActionResult Detail(int id)
-        {
-            var category = _db.Categories.Find(id);
-            return View(category);
         }
     }
 }
