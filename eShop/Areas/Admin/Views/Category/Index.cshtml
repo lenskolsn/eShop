@@ -9,6 +9,21 @@
 <p>
     <a asp-action="Create" class="btn btn-success"><i class="fas fa-plus"></i> Create New</a>
 </p>
+
+@if (TempData["Err"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>@TempData["Err"]</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}@if (TempData["SuccessMess"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>@TempData["SuccessMess"]</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <table class="table table-bordered table-hover table-striped">
     <thead>
         <tr>
@@ -31,19 +46,22 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Name)
+                    @Html.DisplayFor(modelItem => item.Id)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Id)
+                    @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.CreatedAt)
                 </td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-warning" asp-action="Update" asp-route-id="@item.Id"><i class="fas fa-edit"></i></a>
-                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id"><i class="fas fa-trash"></i></a>
+                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id" onclick="return comfirm('Bạn có chắc xóa không?')"><i class="fas fa-trash"></i></a>
                 </td>
             </tr>
-}
+        }
     </tbody>
 </table>
+<code>
+    @ViewBag.Sql
+</code>
