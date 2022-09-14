@@ -16,15 +16,17 @@ namespace eShop.Areas.Admin.Controllers
         {
             _mapper = mapper;
         }
-
         public IActionResult Index()
+        {
+            return View();
+        }
+        public List<ListItemCategoryVM> GetAll()
         {
             var query = _db.Categories
                 .ProjectTo<ListItemCategoryVM>(AutoMapperProfile.CategoryConfig)
                 .OrderByDescending(c => c.Id);
-            ViewBag.Sql = query.ToQueryString();
             var data = query.ToList();
-            return View(data);
+            return data;
         }
 
         public IActionResult Create()
@@ -75,6 +77,7 @@ namespace eShop.Areas.Admin.Controllers
             {
                 _mapper.Map(categoryVM, category);
                 _db.SaveChanges();
+                TempData["SuccessMess"] = "Cập nhật danh mục thành công!";
             }
             return RedirectToAction("Index");
         }
@@ -84,17 +87,19 @@ namespace eShop.Areas.Admin.Controllers
             // Không cho xóa nếu đã có danh mục sản phẩm
             if (_db.Products.Any(p => p.CategoryId == id))
             {
-                TempData["Err"] = "Danh mục đã được sử dụng! Không thể xóa";
-                return RedirectToAction("Index");
+                return Ok(new
+                {
+                    success = false,
+                    mesg = "Danh mục đã được sử dụng! Không thể xóa"
+                });
             }
             var category = _db.Categories.Find(id);
-            if (category != null)
+            _db.Categories.Remove(category);
+            _db.SaveChanges();
+            return Ok(new
             {
-                _db.Categories.Remove(category);
-                _db.SaveChanges();
-                TempData["SuccessMess"] = "Xóa danh mục thành công!";
-            }
-            return RedirectToAction("Index");
+                success = true,
+            });
         }
     }
 }

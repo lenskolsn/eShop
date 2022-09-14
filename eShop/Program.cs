@@ -14,11 +14,13 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
     var connectionString = builder.Configuration.GetConnectionString("DB");
     opts.UseSqlServer(connectionString);
 });
+
 // Cấu hình mapper
 var mapperConfig = new MapperConfiguration(opt =>
 {
     opt.AddProfile<AutoMapperProfile>();
 });
+
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
