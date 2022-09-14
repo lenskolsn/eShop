@@ -35,12 +35,16 @@ namespace eShop.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(AddOrUpdateCategoryVM categoryVM)
+        public IActionResult Create([FromBody] AddOrUpdateCategoryVM categoryVM)
         {
             // xác thực dữ liệu
             if (ModelState.IsValid == false)
             {
-                return View(categoryVM);
+                return Ok(new
+                {
+                    success = false,
+                    mesg = "Dữ liệu không hợp lệ"
+                });
             }
             // lưu vào database
             var category = new Category();
@@ -52,7 +56,10 @@ namespace eShop.Areas.Admin.Controllers
 
             _db.Categories.Add(category);
             _db.SaveChanges();
-            return RedirectToAction("Index");
+            return Ok(new
+            {
+                success = true,
+            });
         }
 
         public IActionResult Update(int id)
@@ -65,8 +72,23 @@ namespace eShop.Areas.Admin.Controllers
                     }).FirstOrDefault(c => c.Id == id);
             return View(category);
         }
+        public IActionResult GetForUpdate(int id)
+        {
+            var category = _db.Categories
+                    .Where(c => c.Id == id)
+                    .ProjectTo<AddOrUpdateCategoryVM>(AutoMapperProfile.CategoryConfig)
+                    .FirstOrDefault();
+            return Ok(category);
+            //var category = _db.Categories
+            //       .Select(c => new AddOrUpdateCategoryVM
+            //       {
+            //           Id = c.Id,
+            //           Name = c.Name
+            //       }).FirstOrDefault(c => c.Id == id);
+            //return Ok(category);
+        }
         [HttpPost]
-        public IActionResult Update(int id, AddOrUpdateCategoryVM categoryVM)
+        public IActionResult Update(int id, [FromBody] AddOrUpdateCategoryVM categoryVM)
         {
             if (ModelState.IsValid == false)
             {
@@ -79,7 +101,10 @@ namespace eShop.Areas.Admin.Controllers
                 _db.SaveChanges();
                 TempData["SuccessMess"] = "Cập nhật danh mục thành công!";
             }
-            return RedirectToAction("Index");
+            return Ok(new
+            {
+                success = true,
+            });
         }
 
         public IActionResult Delete(int id)

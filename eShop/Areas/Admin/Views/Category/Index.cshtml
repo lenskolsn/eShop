@@ -50,21 +50,18 @@
                 <td>{{item.name}}</td>
                 <td>{{new Date(item.createAt).toLocaleString()}}</td>
                 <td class="text-center">
-                    <button class="btn btn-sm btn-warning"><a v-bind:href="`/Admin/Category/Update/` + item.id" class="text-decoration-none text-light"><i class="fas fa-edit"></i></a></button>
+                    <button v-on:click="getDataForUpdate(item.id)" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
                     <button v-on:click="deleteCategory(item.id)" class="btn btn-sm btn-danger mx-2"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>
         </tbody>
     </table>
     <partial name="_Create" />
-       <textarea v-model="cateData.name"></textarea>
-    <p>{{cateData.name}}</p>
 </div>
 
 
 @section Scripts{
     <script>
-
         let noti = new AWN(); // awesome-notifications
 
         let modalCreate = new bootstrap.Modal("#modalCreate");
@@ -72,16 +69,68 @@
         Vue.createApp({
             data() {
                 return {
+                    action: '',
+                    mCreate: {},
                     categories: [],
                     cateData: {
-                        name: 'Nam Le'
+                        id: 0,
+                        name: null
                     }
                 }
             },
-            methods: {  
+            methods: {
                 // hiển thị popup tạo danh mục
                 showCreateModel() {
-                    modalCreate.show();
+                    // gán lại dữ liệu
+                    this.cateData.id = 0;
+                    this.cateData.name = null;
+                    this.action = 'Thêm mới';
+                    this.mCreate.show();
+                },
+                // thêm danh mục
+                addOrUpdate() {
+                    if (!this.cateData.name) {
+                        noti.warning('Chưa nhập dữ liệu!');
+                        return;
+                    }
+                    let url = '/Admin/Category/Create';
+                    if (this.cateData.id != 0) {
+                        url = '/Admin/Category/Update/' + this.cateData.id;
+                    }
+
+                    noti.async(
+                        // gọi ajax đến action Create
+                        axios.post(url, this.cateData),
+                        // thành công
+                        (res) => {
+                            var data = res.data;
+                            if (data.success) {
+                                noti.success(this.action + " danh mục thành công!");
+                                // tắt popup modal
+                                this.mCreate.hide();
+
+                                // load lại dữ liệu trang index
+                                this.refreshData();
+                            } else {
+                                noti.warning(data.mesg)
+                            }
+                        }
+                    );
+                },
+                // lấy dữ liệu cho hàm update
+                getDataForUpdate(id) {
+                    noti.async(
+                        // gọi ajax đến action Create
+                        axios.get("/Admin/Category/GetForUpdate/" + id),
+                        // thành công
+                        (res) => {
+                            var data = res.data;
+                            this.cateData = { ...data }; // copy data
+                            this.mCreate.show();
+                            this.action = 'Cập nhật';
+                            console.log(data);
+                        }
+                    );
                 },
                 // xóa danh mục
                 deleteCategory(id) {
@@ -131,6 +180,7 @@
                 }
             },
             mounted() {
+                this.mCreate = new bootstrap.Modal('#modalCreate');
                 this.refreshData();
             }
         }).mount("#vueData")
