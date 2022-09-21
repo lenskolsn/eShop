@@ -5,6 +5,7 @@ using eShop.Database;
 using eShop.Database.Entities;
 using eShop.WebConfigs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 
 namespace eShop.Areas.Admin.Controllers
@@ -15,6 +16,20 @@ namespace eShop.Areas.Admin.Controllers
         public CategoryController(AppDbContext db, IMapper mapper) : base(db)
         {
             _mapper = mapper;
+        }
+        // Action này chạy trước cái action khác
+        public override void OnActionExecuted(ActionExecutedContext context)
+        {
+            var method = context.HttpContext.Request.Method;
+            if (method == HttpMethod.Post.Method)
+            {
+                if (!ModelState.IsValid)
+                {
+                    // Trả về Json thông báo lỗi nếu dữ liệu ko hợp lệ
+                    var errorModel = new SerializableError(ModelState);
+                    context.Result = new BadRequestObjectResult(errorModel);
+                }
+            }
         }
         public IActionResult Index()
         {
@@ -27,11 +42,6 @@ namespace eShop.Areas.Admin.Controllers
                 .OrderByDescending(c => c.Id);
             var data = query.ToList();
             return data;
-        }
-
-        public IActionResult Create()
-        {
-            return View();
         }
 
         [HttpPost]
@@ -62,16 +72,6 @@ namespace eShop.Areas.Admin.Controllers
             });
         }
 
-        public IActionResult Update(int id)
-        {
-            var category = _db.Categories
-                    .Select(c => new AddOrUpdateCategoryVM
-                    {
-                        Id = c.Id,
-                        Name = c.Name
-                    }).FirstOrDefault(c => c.Id == id);
-            return View(category);
-        }
         public IActionResult GetForUpdate(int id)
         {
             var category = _db.Categories
