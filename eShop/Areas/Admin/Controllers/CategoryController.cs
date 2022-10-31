@@ -4,12 +4,15 @@ using eShop.Areas.Admin.ViewModels.Category;
 using eShop.Database;
 using eShop.Database.Entities;
 using eShop.WebConfigs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 
 namespace eShop.Areas.Admin.Controllers
 {
+    [Authorize]
+    [Area("Admin")]
     public class CategoryController : BaseController
     {
         private readonly IMapper _mapper;

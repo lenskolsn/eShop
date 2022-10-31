@@ -9,7 +9,9 @@
         public decimal? DiscountPrice { get; set; }
         public string? CoverImg { get; set; }
         public int InStock { get; set; }
-        public int? CategoryId { get; set; }
+        public string CategoryName { get; set; }
+
+        //public int? CategoryId { get; set; }
         public DateTime? CreateAt { get; set; }
     }
 }

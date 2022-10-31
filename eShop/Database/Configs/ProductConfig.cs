@@ -10,6 +10,8 @@ namespace eShop.Database.Configs
         {
             builder.Property(x => x.Name).HasMaxLength(200);
             builder.Property(x => x.Description).HasColumnType("ntext");
+            builder.Property(x => x.Price).HasColumnType("decimal");
+            builder.Property(x => x.InStock).HasColumnType("int");
             builder.Property(x => x.CoverImg).HasMaxLength(500);
 
             // khóa ngoại

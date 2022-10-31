@@ -32,6 +32,14 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="Admin" asp-controller="Product" asp-action="Index">Product</a>
                         </li>
+                        @if (User.Identity.IsAuthenticated) // Đã đăng nhập
+                        {
+                            var username = User.FindFirst("Username").Value;
+                            <li class="nav-item d-flex">
+                                <a class="nav-link text-primary"><span>Xin chào @username</span></a>
+                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Account" asp-action="Logout">Đăng xuất</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

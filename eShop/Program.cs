@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using eShop.WebConfigs;
+using eShop.Areas.Admin.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,15 @@ var mapperConfig = new MapperConfiguration(opt =>
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
+// cấu hình đăng nhập bằng cookies
+builder.Services.AddAuthentication("Cookies").AddCookie(opt =>
+{
+    opt.LoginPath = "/login";
+    opt.ExpireTimeSpan = TimeSpan.FromHours(8); // hết hạn sau 8h   
+    opt.Cookie.HttpOnly = true; // tầng bảo mật
+
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -39,6 +49,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication(); // phải nằm trên UseAuthorization()
 app.UseAuthorization();
 
 app.MapAreaControllerRoute(
@@ -50,5 +61,7 @@ app.MapAreaControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+PathHelper.SetWebRootPath(app.Environment.WebRootPath);
 
 app.Run();

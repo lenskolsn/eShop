@@ -18,6 +18,21 @@
       "provider": "cdnjs",
       "library": "awesome-notifications@3.1.3",
       "destination": "wwwroot/lib/awesome-notifications/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "jqueryui@1.13.2",
+      "destination": "wwwroot/lib/jqueryui/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "elfinder@2.1.61",
+      "destination": "wwwroot/lib/elfinder/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "jquery@3.6.1",
+      "destination": "wwwroot/lib/jquery/"
     }
   ]
 }

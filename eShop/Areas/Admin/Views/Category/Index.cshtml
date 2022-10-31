@@ -95,10 +95,6 @@
                 },
                 // thêm danh mục
                 addOrUpdate() {
-                    if (!this.cateData.name) {
-                        noti.warning('Chưa nhập dữ liệu!');
-                        return;
-                    }
                     let url = '/Admin/Category/Create';
                     if (this.cateData.id != 0) {
                         url = '/Admin/Category/Update/' + this.cateData.id;
@@ -121,12 +117,13 @@
                             }
                         },
                         (err) => {
+                            console.log(err);
                             let statusCode = err.response.status;
                             if (statusCode = 400) {
                                 var errRes = err.response.data;
                                 for (let prop in errRes) {
                                     for (let mesg of errRes[prop]) {
-                                        noti.alert(mesg);
+                                        noti.alert(mesg);   
                                         return;
                                     }
                                 }

@@ -4,16 +4,33 @@ using eShop.Areas.Admin.ViewModels.Product;
 using eShop.Database;
 using eShop.Database.Entities;
 using eShop.WebConfigs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace eShop.Areas.Admin.Controllers
 {
+    [Authorize]
+    [Area("Admin")]
     public class ProductController : BaseController
     {
         private readonly IMapper _mapper;
         public ProductController(AppDbContext db, IMapper mapper) : base(db)
         {
             _mapper = mapper;
+        }
+        public override void OnActionExecuted(ActionExecutedContext context)
+        {
+            var method = context.HttpContext.Request.Method;
+            if (method == HttpMethod.Post.Method)
+            {
+                if (!ModelState.IsValid)
+                {
+                    // Trả về Json thông báo lỗi nếu dữ liệu ko hợp lệ
+                    var errorModel = new SerializableError(ModelState);
+                    context.Result = new BadRequestObjectResult(errorModel);
+                }
+            }
         }
         public IActionResult Index()
         {
@@ -30,16 +47,28 @@ namespace eShop.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult Create([FromBody] AddOrUpdateProductVM productVM)
         {
+            // xác thực dữ liệu
+            if (ModelState.IsValid == false)
+            {
+                return Ok(new
+                {
+                    success = false,
+                    mesg = "Dữ liệu không hợp lệ"
+                });
+            }
+
             var product = new Product();
+            // Map(from, to)
             _mapper.Map(productVM, product);
 
             product.CreateAt = DateTime.Now;
             product.UpdateAt = DateTime.Now;
-
             _db.Products.Add(product);
             _db.SaveChanges();
-
-            return RedirectToAction("Index");
+            return Ok(new
+            {
+                success = true,
+            });
         }
         public IActionResult Delete(int id)
         {

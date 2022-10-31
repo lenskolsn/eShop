@@ -1,0 +1,13 @@
+﻿@model SelectList
+@{ 
+    string vModel = ViewBag.vModel as String;
+}
+
+@if (string.IsNullOrEmpty(vModel)){ 
+<select asp-items="Model" class="form-select"></select>
+}
+else{
+<select asp-items="Model" v-model="@vModel" class="form-select">
+    <option value="" selected disabled>-- Chọn 1 danh mục --</option>
+</select>
+}
